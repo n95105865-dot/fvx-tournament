@@ -84,24 +84,38 @@ return '<div class="card"><h3>🔥 '+esc(t.name)+'</h3>'+
 }
 
 function show(page){
-document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
-document.getElementById("n-"+page)?.classList.add("active");
-const app=document.getElementById("app");
+  document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
+  document.getElementById("n-"+page)?.classList.add("active");
 
-if(page==="home"){
-app.innerHTML='<section class="hero"><h1>🏆 FVX NIGHT CUP</h1>'+
-'<p>Entry ৳20 • Prize Pool ৳1,000 • Squad</p>'+
-'<button onclick="register('FVX NIGHT CUP')">JOIN NOW</button></section>'+
-'<h2>Quick Actions</h2><div class="grid">'+
-'<div class="quick">🎮<br>Solo</div><div class="quick">👥<br>Squad</div>'+
-'<div class="quick" onclick="show('profile')">🏆<br>My Tournaments</div>'+
-'<div class="quick">📢<br>Notice</div></div><h2>Upcoming</h2>'+
-tournaments.map(card).join("");
+  const app=document.getElementById("app");
+
+  if(page==="home"){
+    app.innerHTML=
+      '<section class="hero">'+
+      '<h1>🏆 FVX NIGHT CUP</h1>'+
+      '<p>Entry ৳20 • Prize Pool ৳1,000 • Squad</p>'+
+      '<button onclick="register(\'FVX NIGHT CUP\')">JOIN NOW</button>'+
+      '</section>'+
+      '<h2>Quick Actions</h2>'+
+      '<div class="grid">'+
+      '<div class="quick">🎮<br>Solo</div>'+
+      '<div class="quick">👥<br>Squad</div>'+
+      '<div class="quick" onclick="show(\'profile\')">🏆<br>My Tournaments</div>'+
+      '<div class="quick">📢<br>Notice</div>'+
+      '</div>'+
+      '<h2>Upcoming</h2>'+
+      tournaments.map(card).join("");
+  }
+
+  if(page==="tournaments"){
+    app.innerHTML="<h1>🏆 Tournaments</h1>"+tournaments.map(card).join("");
+  }
+
+  if(page==="leaderboard") leaderboard();
+
+  if(page==="profile") profile();
 }
-if(page==="tournaments")app.innerHTML="<h1>🏆 Tournaments</h1>"+tournaments.map(card).join("");
-if(page==="leaderboard")leaderboard();
-if(page==="profile")profile();
-}
+
 
 function register(name){
 window.currentTournament=name;
