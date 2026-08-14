@@ -130,14 +130,32 @@ await loadData();
 }
 
 function profile(){
-const kills=results.reduce((s,x)=>s+(Number(x.kills)||0),0);
-document.getElementById("app").innerHTML=
-'<h1>👤 Profile</h1><div class="card"><h2>NAYEM</h2>'+
-'<p class="muted">Free Fire UID: —</p><p>🏆 Registrations: '+regs.length+'</p>'+
-'<p>🥇 Wins: 0</p><p>🎯 Total Kills: '+kills+'</p></div>'+
-'<div class="card"><h3>👨‍💼 Admin</h3>'+
-'<p class="muted">Demo admin panel. Firebase Authentication and Security Rules should be added before public launch.</p>'+
-'<button onclick="adminLogin()">OPEN ADMIN PANEL</button></div>';
+  try{
+    const kills = results.reduce(
+      (s,x) => s + (Number(x.kills) || 0),
+      0
+    );
+
+    document.getElementById("app").innerHTML =
+      '<h1>👤 Profile</h1>' +
+      '<div class="card">' +
+      '<h2>NAYEM</h2>' +
+      '<p class="muted">Free Fire UID: —</p>' +
+      '<p>🏆 Registrations: ' + (regs?.length || 0) + '</p>' +
+      '<p>🥇 Wins: 0</p>' +
+      '<p>🎯 Total Kills: ' + kills + '</p>' +
+      '</div>' +
+      '<div class="card">' +
+      '<h3>👨‍💼 Admin</h3>' +
+      '<p class="muted">Admin panel</p>' +
+      '<button onclick="adminLogin()">OPEN ADMIN PANEL</button>' +
+      '</div>';
+  }catch(e){
+    console.error(e);
+    document.getElementById("app").innerHTML =
+      '<div class="card"><h2>⚠️ Profile Error</h2>' +
+      '<p>Profile load করতে সমস্যা হয়েছে।</p></div>';
+  }
 }
 
 function adminLogin(){
