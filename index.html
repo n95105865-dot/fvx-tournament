@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FVX Esports Hub</title>
+<style>
+:root{--bg:#f4f7fb;--card:#fff;--text:#172033;--muted:#697386;--brand:#e53935;--brand2:#ffb300;--line:#e7ebf2;--green:#16a34a;--blue:#2563eb;--shadow:0 8px 25px rgba(20,30,50,.08)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
+header{background:#fff;border-bottom:1px solid var(--line);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20}
+.logo{font-weight:900;font-size:20px}.logo b{color:var(--brand)}.logo span{color:#111}
+.icon{background:#f3f5f9;border:0;border-radius:12px;padding:10px 12px}
+main{max-width:900px;margin:auto;padding:18px 16px 100px}
+.hero{background:linear-gradient(120deg,#e53935,#ff7a18);color:#fff;border-radius:22px;padding:25px;box-shadow:var(--shadow);margin-bottom:18px}
+.hero h1{margin:0 0 8px;font-size:30px}.hero p{margin:0 0 18px;opacity:.92}
+.btn{border:0;border-radius:11px;padding:11px 16px;font-weight:800;cursor:pointer;background:var(--brand2);color:#171717}
+.btn.white{background:#fff;color:#b71c1c}.btn.blue{background:var(--blue);color:#fff}.btn.green{background:var(--green);color:#fff}.btn.gray{background:#eef1f6;color:#293246}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.card{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:16px;margin:11px 0;box-shadow:var(--shadow)}
+.stat{display:flex;align-items:center;gap:12px}.stat .ico{font-size:25px}.muted{color:var(--muted);font-size:13px}.row{display:flex;justify-content:space-between;gap:10px;align-items:center;margin:8px 0}
+h2{font-size:21px;margin:20px 0 10px}h3{margin:3px 0 8px}.badge{padding:5px 9px;border-radius:20px;background:#fff4d6;color:#8a5a00;font-size:12px;font-weight:800}.approved{background:#dcfce7;color:#166534}.pending{background:#fff7ed;color:#9a3412}
+input,select,textarea{width:100%;border:1px solid #d9deea;background:#fff;color:#172033;padding:12px;border-radius:10px;margin:5px 0;font:inherit}textarea{min-height:180px}
+.nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);z-index:30}.nav button{background:#fff;border:0;padding:9px 3px;color:#697386;font-size:11px}.nav button.active{color:var(--brand);font-weight:800}
+.room{background:#eef7ff;border:1px solid #cfe6ff;border-radius:13px;padding:12px;margin-top:10px}.room b{color:#1459a6}.rules{white-space:pre-wrap;line-height:1.6;font-size:14px}.ad{border-left:5px solid var(--brand2);background:#fff9e8}
+table{width:100%;border-collapse:collapse}td,th{text-align:left;padding:10px;border-bottom:1px solid var(--line);font-size:13px}
+.toast{padding:10px;border-radius:10px;margin-top:8px;background:#ecfdf3;color:#166534}.err{background:#fff1f2;color:#be123c}
+.ai{position:fixed;right:18px;bottom:75px;width:54px;height:54px;border:0;border-radius:50%;background:#172033;color:#fff;font-size:22px;box-shadow:var(--shadow);z-index:35}
+@media(max-width:650px){.grid{grid-template-columns:1fr}.hero h1{font-size:25px}}
+</style>
+
+<style>
+.profile-extra-features{margin:16px 0;background:#fff;border:1px solid #e5e7ef;border-radius:18px;padding:14px;box-shadow:0 8px 22px rgba(35,42,65,.07)}
+.profile-extra-features h3{margin:0 0 10px;font-size:18px}
+.profile-extra-features button{width:100%;border:1px solid #e5e7ef;background:#f7f7fb;color:#25283a;border-radius:12px;padding:11px 12px;margin:4px 0;text-align:left;font-weight:700;cursor:pointer}
+.profile-extra-features button:hover{background:#efedff}
+</style>
+</head>
+<body>
+<header><div class="logo">🔥 <b>FLAME</b> <span>VORTEX</span></div><button class="icon" onclick="profile()">👤</button></header>
+<main id="app">
+<div class="profile-extra-features">
+  <h3>Player Features</h3>
+  <button onclick="openMyTournamentDashboard()">🏆 My Tournament Dashboard</button>
+  <button onclick="openTournamentHistory()">📜 Tournament History</button>
+  <button onclick="openPlayerStats()">📊 Player Stats</button>
+  <button onclick="shareTournament()">📤 Share Tournament</button>
+  <button onclick="openNotifications()">🔔 Notifications</button>
+</div>
+</main>
+<button class="ai" onclick="aiHelp()">🤖</button>
+<div class="nav">
+<button id="n-home" onclick="show('home')">🏠<br>Home</button>
+<button id="n-t" onclick="show('tournaments')">🏆<br>Tournaments</button>
+<button id="n-reg" onclick="show('registrations')">📝<br>My Reg</button>
+<button id="n-lb" onclick="show('leaderboard')">📊<br>Leaderboard</button>
+<button id="n-p" onclick="profile()">👤<br>Profile</button>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig={
+ apiKey:"AIzaSyA0hGSo2rjgn2CZkSDR4LYYSfksd0j9b_s",
+ authDomain:"fvx-tournament.firebaseapp.com",
+ projectId:"fvx-tournament",
+ storageBucket:"fvx-tournament.firebasestorage.app",
+ messagingSenderId:"1075686507431",
+ appId:"1:1075686507431:web:855fd10ae33355d5aa2c82"
+};
+firebase.initializeApp(firebaseConfig);const db=firebase.firestore();
+let tournaments=[],regs=[],results=[],rooms=[],rulesText=`📜 FULL TOURNAMENT RULES
+
+1. সঠিক Player Name ও UID দিতে হবে।
+2. ভুল তথ্য দিলে Registration বাতিল হতে পারে।
+3. Approved Player ছাড়া Match-এ অংশ নেওয়া যাবে না।
+4. Hack, Script, Cheat বা unfair advantage নিষিদ্ধ।
+5. Room ID ও Password নির্ধারিত সময়ে প্রকাশ করা হবে।
+6. Match শুরু হওয়ার আগে Room-এ Join করতে হবে।
+7. Admin-এর সিদ্ধান্ত Rules অনুযায়ী চূড়ান্ত হবে।
+8. Result যাচাই শেষে Leaderboard প্রকাশ করা হবে।`;
+let currentTournament="";
+
+function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+async function load(){
+ try{
+  const q=await Promise.all([
+   db.collection("tournaments").orderBy("createdAt","desc").get(),
+   db.collection("registrations").orderBy("createdAt","desc").get(),
+   db.collection("results").orderBy("points","desc").get(),
+   db.collection("rooms").orderBy("createdAt","desc").get(),
+   db.collection("settings").doc("rules").get()
+  ]);
+  tournaments=q[0].docs.map(d=>({id:d.id,...d.data()}));
+  regs=q[1].docs.map(d=>({id:d.id,...d.data()}));
+  results=q[2].docs.map(d=>({id:d.id,...d.data()}));
+  rooms=q[3].docs.map(d=>({id:d.id,...d.data()}));
+  if(q[4].exists&&q[4].data().text)rulesText=q[4].data().text;
+ }catch(e){console.log(e)}
+}
+function roomFor(n){return rooms.find(r=>String(r.tournament)===String(n))}
+function slotsFor(t){let total=String(t.slots||"0/48").split("/")[1]||"48";let used=regs.filter(r=>r.tournament===t.name).length;return used+"/"+total}
+function tournamentCard(t){
+ let room=roomFor(t.name);
+ return `<div class="card">
+ <div class="row"><h3>🏆 ${esc(t.name)}</h3><span class="badge">${esc(t.mode||"Squad")}</span></div>
+ <div class="grid"><div class="stat"><span class="ico">🎟️</span><div><b>${esc(t.entry||"Free")}</b><div class="muted">Entry Fee</div></div></div>
+ <div class="stat"><span class="ico">💰</span><div><b>${esc(t.prize||"—")}</b><div class="muted">Prize Pool</div></div></div></div>
+ <div class="row muted"><span>📅 ${esc(t.date||"TBA")} • ⏰ ${esc(t.time||"TBA")}</span><b>${esc(slotsFor(t))} Slots</b></div>
+ ${room?`<div class="room">🎮 <b>Room Published</b><br>Room ID: <b>${esc(room.roomId)}</b><br>Password: <b>${esc(room.password)}</b><br>Time: ${esc(room.time)}</div>`:""}
+ <button class="btn blue" onclick='details(${JSON.stringify(t.name)})'>VIEW</button>
+ <button class="btn" onclick='register(${JSON.stringify(t.name)})'>REGISTER</button>
+ </div>`;
+}
+function nav(active){document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("active"));let el=document.getElementById("n-"+active);if(el)el.classList.add("active")}
+function show(p){
+ if(p==="home"){nav("home");home()}
+ if(p==="tournaments"){nav("t");document.getElementById("app").innerHTML="<h2>🏆 All Tournaments</h2>"+(tournaments.map(tournamentCard).join("")||'<div class="card">কোনো Tournament নেই।</div>')}
+ if(p==="registrations"){nav("reg");myRegs()}
+ if(p==="leaderboard"){nav("lb");leaderboard()}
+}
+function home(){
+ nav("home");
+ document.getElementById("app").innerHTML=`<section class="hero"><h1>🔥 FVX Esports Tournament Hub</h1><p>Register • Play • Compete • Win</p><button class="btn white" onclick="show('tournaments')">VIEW TOURNAMENTS</button></section>
+ <div class="grid"><div class="card"><div class="stat"><span class="ico">🏆</span><div><b>${tournaments.length}</b><div class="muted">Active Tournaments</div></div></div></div>
+ <div class="card"><div class="stat"><span class="ico">👥</span><div><b>${regs.length}</b><div class="muted">Registrations</div></div></div></div></div>
+ <div class="card ad"><h3>📢 Advertisement</h3><p class="muted">এখানে তোমার Tournament Promotion, Sponsor অথবা Announcement দেখাতে পারবে।</p><button class="btn" onclick="promo()">PROMOTE TOURNAMENT</button></div>
+ <h2>🔥 Upcoming Tournaments</h2>${tournaments.slice(0,6).map(tournamentCard).join("")||'<div class="card">এখনো Tournament তৈরি করা হয়নি। Admin Panel থেকে Create Tournament করো।</div>'}`;
+}
+function details(name){
+ const t=tournaments.find(x=>x.name===name)||{name};const room=roomFor(name);
+ document.getElementById("app").innerHTML=`<button class="btn gray" onclick="show('tournaments')">← Back</button><h2>🏆 ${esc(name)}</h2>${tournamentCard(t)}
+ <div class="card"><h3>📜 Full Tournament Rules</h3><div class="rules">${esc(rulesText)}</div></div>
+ ${room?`<div class="card"><h3>🎮 Match Room</h3><div class="room">🆔 ${esc(room.roomId)}<br>🔐 ${esc(room.password)}<br>⏰ ${esc(room.time)}</div></div>`:""}`;
+}
+function register(name){
+ currentTournament=name;
+ document.getElementById("app").innerHTML=`<button class="btn gray" onclick='details(${JSON.stringify(name)})'>← Back</button><h2>📝 Registration</h2>
+ <div class="card"><h3>${esc(name)}</h3><input id="rname" placeholder="Player / Team Name"><input id="uid" placeholder="Free Fire UID"><input id="contact" placeholder="Contact Number">
+ <label><input type="checkbox" id="agree" style="width:auto"> I agree to Tournament Rules</label><br><button class="btn green" onclick="submitReg()">CONFIRM REGISTRATION</button><div id="regmsg"></div></div>`;
+}
+async function submitReg(){
+ if(!rname.value.trim()||!uid.value.trim()){regmsg.innerHTML='<div class="toast err">Name এবং UID দাও।</div>';return}
+ if(!agree.checked){regmsg.innerHTML='<div class="toast err">Rules accept করো।</div>';return}
+ try{await db.collection("registrations").add({name:rname.value.trim(),uid:uid.value.trim(),phone:contact.value.trim(),tournament:currentTournament,status:"Pending",createdAt:firebase.firestore.FieldValue.serverTimestamp()});regmsg.innerHTML='<div class="toast">✅ Registration submitted — Pending Approval.</div>';await load()}catch(e){regmsg.innerHTML='<div class="toast err">Registration save হয়নি।</div>'}
+}
+function myRegs(){
+ nav("reg");let mine=regs;
+ document.getElementById("app").innerHTML=`<h2>📝 Registration Status</h2>${mine.map(r=>`<div class="card"><div class="row"><b>${esc(r.name)}</b><span class="badge ${r.status==="Approved"?"approved":"pending"}">${esc(r.status||"Pending")}</span></div><div class="muted">${esc(r.tournament)} • UID ${esc(r.uid)}</div></div>`).join("")||'<div class="card">কোনো Registration নেই।</div>'}`;
+}
+function leaderboard(){
+ nav("lb");let d=[...results].sort((a,b)=>(b.points||0)-(a.points||0));
+ document.getElementById("app").innerHTML=`<h2>📊 Leaderboard</h2><div class="card"><table><tr><th>#</th><th>Player/Team</th><th>Kills</th><th>Points</th></tr>${d.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.name)}</td><td>${esc(x.kills)}</td><td><b>${esc(x.points)}</b></td></tr>`).join("")||'<tr><td colspan="4">No results yet.</td></tr>'}</table></div>`;
+}
+function profile(){
+ nav("p");document.getElementById("app").innerHTML=`<h2>👤 Profile</h2><div class="card"><div class="stat"><span class="ico">📝</span><div><b>${regs.length}</b><div class="muted">Total Registrations</div></div></div></div>
+ <div class="card"><h3>👨‍💼 Admin Panel</h3><p class="muted">Tournament create, approval, room, rules, results ও promotion এখান থেকে manage করা যাবে।</p><button class="btn blue" onclick="adminLogin()">OPEN ADMIN PANEL</button></div>`;
+}
+function adminLogin(){document.getElementById("app").innerHTML=`<h2>🔐 Admin Login</h2><div class="card"><input id="apass" type="password" placeholder="Admin Password"><button class="btn blue" onclick="if(apass.value==='FVX123')admin();else amsg.textContent='Wrong password'"><div id="amsg" class="muted"></div></div>`}
+async function admin(){
+ await load();
+ document.getElementById("app").innerHTML=`<h2>👨‍💼 Admin Panel</h2>
+ <div class="card"><h3>🏆 Create Tournament</h3>
+ <input id="ctn" placeholder="Tournament Name"><select id="cm"><option>Solo</option><option>Duo</option><option>Squad</option></select>
+ <input id="ce" placeholder="Entry Fee"><input id="cp" placeholder="Prize Pool"><input id="cs" type="number" value="48" placeholder="Total Slots">
+ <input id="cd" type="date"><input id="ct" type="time"><button class="btn blue" onclick="createTournament()">CREATE TOURNAMENT</button><div id="cmsg"></div></div>
+
+ <div class="card"><h3>🕐 Tournament Time Edit</h3><select id="etid">${tournaments.map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join("")}</select><input id="ed" type="date"><input id="et" type="time"><button class="btn" onclick="editTournamentTime()">SAVE TIME</button><div id="emsg"></div></div>
+
+ <div class="card"><h3>📋 Registration Approval</h3>${regs.map(r=>`<div class="row"><span><b>${esc(r.name)}</b><br><small>${esc(r.uid)} • ${esc(r.tournament)}</small></span><button class="btn ${r.status==="Approved"?"green":"gray"}" onclick='toggleApprove("${r.id}","${esc(r.status)}")'>${esc(r.status||"Pending")}</button></div>`).join("")||"No registrations."}</div>
+
+ <div class="card"><h3>🎮 Match Room + Publish</h3><input id="rtour" placeholder="Tournament Name"><input id="rid" placeholder="Room ID"><input id="rpass" placeholder="Room Password"><input id="rtime" placeholder="Room Time"><button class="btn green" onclick="publishRoom()">PUBLISH ROOM</button><div id="rmsg"></div></div>
+
+ <div class="card"><h3>📜 Full Rules</h3><textarea id="rules">${esc(rulesText)}</textarea><button class="btn" onclick="saveRules()">SAVE RULES</button><div id="rulesmsg"></div></div>
+
+ <div class="card"><h3>📢 Advertisement / Promotion</h3><input id="adtitle" placeholder="Ad / Announcement Title"><input id="adtext" placeholder="Promotion Text"><button class="btn" onclick="saveAd()">SAVE AD</button><div id="admsg"></div></div>
+
+ <div class="card"><h3>🏁 Result & Leaderboard</h3><input id="resname" placeholder="Player / Team"><input id="reskills" type="number" placeholder="Kills"><input id="resplace" type="number" placeholder="Placement"><input id="restour" placeholder="Tournament Name"><button class="btn blue" onclick="addResult()">PUBLISH RESULT</button><div id="resmsg"></div></div>`;
+}
+async function createTournament(){
+ if(!ctn.value.trim()){cmsg.innerHTML='<div class="toast err">Tournament Name দাও।</div>';return}
+ try{await db.collection("tournaments").add({name:ctn.value.trim(),mode:cm.value,entry:ce.value||"Free",prize:cp.value||"—",slots:"0/"+(cs.value||48),date:cd.value||"TBA",time:ct.value||"TBA",createdAt:firebase.firestore.FieldValue.serverTimestamp()});cmsg.innerHTML='<div class="toast">✅ Tournament Created!</div>';await load()}catch(e){cmsg.innerHTML='<div class="toast err">Create failed.</div>'}
+}
+async function editTournamentTime(){try{await db.collection("tournaments").doc(etid.value).update({date:ed.value||"TBA",time:et.value||"TBA"});emsg.innerHTML='<div class="toast">✅ Time updated.</div>';await load()}catch(e){emsg.innerHTML='<div class="toast err">Update failed.</div>'}}
+async function toggleApprove(id,status){try{await db.collection("registrations").doc(id).update({status:status==="Approved"?"Pending":"Approved"});admin()}catch(e){alert("Firestore error")}}
+async function publishRoom(){try{await db.collection("rooms").add({tournament:rtour.value.trim(),roomId:rid.value.trim(),password:rpass.value.trim(),time:rtime.value.trim(),published:true,createdAt:firebase.firestore.FieldValue.serverTimestamp()});rmsg.innerHTML='<div class="toast">✅ Room Published.</div>';await load()}catch(e){rmsg.innerHTML='<div class="toast err">Room save failed.</div>'}}
+async function saveRules(){try{rulesText=rules.value.trim();await db.collection("settings").doc("rules").set({text:rulesText,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});rulesmsg.innerHTML='<div class="toast">✅ Rules saved.</div>'}catch(e){rulesmsg.innerHTML='<div class="toast err">Save failed.</div>'}}
+async function saveAd(){try{await db.collection("ads").add({title:adtitle.value,text:adtext.value,active:true,createdAt:firebase.firestore.FieldValue.serverTimestamp()});admsg.innerHTML='<div class="toast">✅ Advertisement saved.</div>'}catch(e){admsg.innerHTML='<div class="toast err">Ad save failed.</div>'}}
+async function addResult(){let k=Number(reskills.value)||0,p=Number(resplace.value)||0,n=resname.value.trim();if(!n)return;try{await db.collection("results").add({name:n,kills:k,placement:p,points:k+Math.max(0,11-p),tournament:restour.value,createdAt:firebase.firestore.FieldValue.serverTimestamp()});resmsg.innerHTML='<div class="toast">✅ Result published.</div>';await load()}catch(e){resmsg.innerHTML='<div class="toast err">Result failed.</div>'}}
+function promo(){alert("📢 Promotion section: Admin Panel → Advertisement থেকে title ও promotion text save করতে পারবে।")}
+function aiHelp(){alert("🤖 FVX AI Assistant\\nTournament, Registration, Approval, Room, Rules ও Leaderboard manage করতে নিচের menu ব্যবহার করো।")}
+(async()=>{await load();home()})();
+</script>
+
+<script>
+function openMyTournamentDashboard(){ alert("My Tournament Dashboard"); }
+function openTournamentHistory(){ alert("Tournament History"); }
+function openPlayerStats(){ alert("Player Stats"); }
+function shareTournament(){
+  const text="Join FVX Esports Tournament!";
+  if(navigator.share){ navigator.share({title:"FVX Esports Tournament",text:text}).catch(()=>{}); }
+  else if(navigator.clipboard){ navigator.clipboard.writeText(text).then(()=>alert("Share text copied.")); }
+  else alert(text);
+}
+function openNotifications(){ alert("Notifications"); }
+</script>
+</body>
+</html>
